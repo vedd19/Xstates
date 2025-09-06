@@ -12,32 +12,41 @@ export default function Xstates() {
 
 
     useEffect(() => {
+        setStates([]);
+        setCities([]);
+        setSelectedState("");
+        setSelectedCity("");
         const fetchData = async () => {
 
-            setStates([]);
-            setCities([]);
-            setSelectedState("");
-            setSelectedCity("");
-            const countriesResponse = await fetch('https://crio-location-selector.onrender.com/countries');
-            const countriesData = await countriesResponse.json();
-            setCountries(countriesData);
+            try {
+                const countriesResponse = await fetch('https://crio-location-selector.onrender.com/countries');
+                const countriesData = await countriesResponse.json();
+                setCountries(countriesData);
+                console.log(countriesData, "countries data");
+            } catch (err) {
+                console.log(err);
+            }
 
         };
 
         fetchData();
-    }, [selectedCountry]);
+    }, []);
 
     useEffect(() => {
+        setStates([]);
         setCities([]);
+        setSelectedState("");
         setSelectedCity("");
-        console.log(selectedCountry, "selected country from useEffect");
-        fetch(`https://crio-location-selector.onrender.com/country=${selectedCountry}/states`).then((res) => res.json()).then((data) => setStates(data));
+        // console.log(selectedCountry, "selected country from useEffect");
+        fetch(`https://crio-location-selector.onrender.com/country=${selectedCountry}/states`).then((res) => res.json()).then((data) => setStates(data)).catch((err) => console.log(err));
 
     }, [selectedCountry])
 
     useEffect(() => {
-        console.log(selectedState, "selected state from useEffect");
-        fetch(`https://crio-location-selector.onrender.com/country=${selectedCountry}/state=${selectedState}/cities`).then((res) => res.json()).then((data) => setCities(data));
+        setCities([]);
+        setSelectedCity("");
+        // console.log(selectedState, "selected state from useEffect");
+        fetch(`https://crio-location-selector.onrender.com/country=${selectedCountry}/state=${selectedState}/cities`).then((res) => res.json()).then((data) => setCities(data)).catch((err) => console.log(err));
 
     }, [selectedState])
 
@@ -47,26 +56,26 @@ export default function Xstates() {
     return (
         <div>
             <h1>Select Location</h1>
-            <div style={{ display: "flex", gap: "20px", justifyContent: "center", marginTop: "50px" }}>
-                <select style={{ padding: "4px" }} onChange={(e) => { setSelectedCountry(e.target.value) }}>
-                    <option >Select Country</option>
+            <div style={{ display: "flex", gap: "20px", justifyContent: "center" }}>
+                <select value={selectedCountry} style={{ padding: "4px" }} onChange={(e) => { setSelectedCountry(e.target.value) }}>
+                    <option value="">Select Country</option>
 
                     {countries.map((country) => (
                         <option key={country} value={country}>{country}</option>
                     ))}
                 </select>
 
-                <select style={{ padding: "4px" }} disabled={!selectedCountry} onChange={(e) => { setSelectedState(e.target.value) }}>
-                    <option selected={true}>Select State</option>
+                <select value={selectedState} style={{ padding: "4px" }} disabled={!selectedCountry} onChange={(e) => { setSelectedState(e.target.value) }}>
+                    <option value="">Select State</option>
 
                     {selectedCountry && states.map((state) => (
                         <option key={state} value={state}>{state}</option>
                     ))}
                 </select>
 
-                <select style={{ padding: "4px" }} disabled={!selectedState} onChange={(e) => { setSelectedCity(e.target.value) }}>
+                <select style={{ padding: "4px" }} value={selectedCity} disabled={!selectedState} onChange={(e) => { setSelectedCity(e.target.value) }}>
 
-                    <option selected={true} >Select City</option>
+                    <option value="">Select City</option>
 
                     {selectedState && cities.map((city) => (
                         <option key={city} value={city}>{city}</option>
